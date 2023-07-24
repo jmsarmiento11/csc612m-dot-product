@@ -4,6 +4,9 @@
 #include <time.h>
 #include <math.h>
 
+extern void SIMDdotProduct(size_t ARRAY_SIZE, float* A, float* B,float* sdot);
+extern void x86dotProduct(size_t ARRAY_SIZE, float* A, float* B, float* sdot);
+
 const int ARRAY_SIZE = 1<<20;
 
 void dotProduct(const float* A, const float* B, float* sdot)
@@ -26,11 +29,11 @@ void verifyDotProduct(const float* sdot, const float* expected)
 {
     for (int i = 0; i < ARRAY_SIZE; i++) {
         if (fabs(sdot[i] - expected[i]) > 1e-5) {
-            printf("Verification failed at index %d\n", i);
+            printf("Error found at index %d\n", i);
             return;
         }
     }
-    printf("Verification successful\n");
+    printf("No error.\n");
 }
 
 int main()
@@ -40,6 +43,12 @@ int main()
     float* sdot = (float*)malloc(ARRAY_SIZE * sizeof(float));
     float* expected = (float*)malloc(ARRAY_SIZE * sizeof(float));
 
+    // --------------------- C++ version ----------------------------------
+
+    
+    //flush out cache
+    dotProduct(A, B, sdot);
+    
     // fill in the host memory with data
     for (int i = 0; i < ARRAY_SIZE; i++) {
         A[i] = i;
@@ -67,6 +76,81 @@ int main()
     printf("Dot product result: %f\n", sum);
     printf("C function took %f microseconds for array size %d \n", time_taken, ARRAY_SIZE);
 
+    // --------------------- x86-64 SIMD YMM register ----------------------------------
+
+        // initialize  back sdot[i] to 0
+    for (int i = 0; i<ARRAY_SIZE; i++)
+        sdot[i] = 0.0f;
+
+    //flush out cache
+    SIMDdotProduct(ARRAY_SIZE, A, B, sdot);
+    
+    // fill in the host memory with data
+    for (int i = 0; i < ARRAY_SIZE; i++) {
+        A[i] = i;
+        B[i] = i;
+        expected[i] = A[i] * B[i]; // compute the expected result on the CPU
+    }
+
+    // Measure execution time
+    start = clock();
+
+    SIMDdotProduct(ARRAY_SIZE, A, B, sdot);
+
+    // verify the correctness of the dot product
+    verifyDotProduct(sdot, expected);
+
+    // finish up on the CPU side
+    sum = 0;
+    for (int i = 0; i < ARRAY_SIZE; i++) {
+        sum += sdot[i];
+    }
+
+    end = clock();
+    time_taken = ((double)(end - start)) * 1e6 / CLOCKS_PER_SEC;
+
+    printf("Dot product result: %f\n", sum);
+    printf("SIMD function took %f microseconds for array size %d \n", time_taken, ARRAY_SIZE);
+
+
+    // --------------------- x86-64 version ----------------------------------
+
+        // initialize  back sdot[i] to 0
+    for (int i = 0; i < ARRAY_SIZE; i++)
+        sdot[i] = 0.0f;
+
+    //flush out cache
+    x86dotProduct(ARRAY_SIZE, A, B, sdot);
+
+    // fill in the host memory with data
+    for (int i = 0; i < ARRAY_SIZE; i++) {
+        A[i] = i;
+        B[i] = i;
+        expected[i] = A[i] * B[i]; // compute the expected result on the CPU
+    }
+
+    // Measure execution time
+    start = clock();
+
+    x86dotProduct(ARRAY_SIZE, A, B, sdot);
+
+    // verify the correctness of the dot product
+    verifyDotProduct(sdot, expected);
+
+    // finish up on the CPU side
+    sum = 0;
+    for (int i = 0; i < ARRAY_SIZE; i++) {
+        sum += sdot[i];
+    }
+
+    end = clock();
+    time_taken = ((double)(end - start)) * 1e6 / CLOCKS_PER_SEC;
+
+    printf("Dot product result: %f\n", sum);
+    printf("x86-64 function took %f microseconds for array size %d \n", time_taken, ARRAY_SIZE);
+    
+    
+    
     // free memory
     free(A);
     free(B);
