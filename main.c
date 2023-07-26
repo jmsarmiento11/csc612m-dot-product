@@ -5,7 +5,10 @@
 #include <math.h>
 
 extern void SIMDdotProduct(size_t ARRAY_SIZE, float* A, float* B,float* sdot);
+<<<<<<< HEAD
 extern void x86dotProduct(size_t ARRAY_SIZE, float* A, float* B, float* sdot);
+=======
+>>>>>>> f35bcde2a6039e6a935b8c2f556fd38623ff0f03
 
 const int ARRAY_SIZE = 1<<20;
 
@@ -111,6 +114,7 @@ int main()
 
     printf("Dot product result: %f\n", sum);
     printf("SIMD function took %f microseconds for array size %d \n", time_taken, ARRAY_SIZE);
+<<<<<<< HEAD
 
 
     // --------------------- x86-64 version ----------------------------------
@@ -148,6 +152,9 @@ int main()
 
     printf("Dot product result: %f\n", sum);
     printf("x86-64 function took %f microseconds for array size %d \n", time_taken, ARRAY_SIZE);
+=======
+    
+>>>>>>> f35bcde2a6039e6a935b8c2f556fd38623ff0f03
     
     
     
