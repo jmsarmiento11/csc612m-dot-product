@@ -6,31 +6,28 @@ The dot product program was implemented in four different approaches: C++, CUDA,
 In terms of execution time, as expected, the GPU Parallelized implementations (CUDA and SIMD) outperformed the other two sequential approaches (C++ and x86) significantly. CUDA and SIMD leverage the parallel processing capabilities of GPUs, which are designed for handling massive parallel tasks. By distributing the workload across numerous threads, these implementations exploit the full potential of the GPU, resulting in faster execution times compared to the other CPU-based approaches. The x86-64 implementation also showed decent performance but couldn't match the speed of CUDA. The C++ implementation without any optimization demonstrated the slowest execution time, as it utilizes a single CPU thread to compute the dot product sequentially.
 
 
-### Comparative analysis of the execution times for each implementation for array size 1<<20
-1. C++: Execution time = 13000 microseconds (μs)
-2. CUDA: Execution time = 3.3706 milliseconds (ms) = 3370.6 microseconds (μs)
-3. SIMD: Execution time = 10000 microseconds (μs)
-4. x86: Execution time = 11000 microseconds (μs)
+### Comparative analysis of the execution times for each implementation for array size 2<<28
+1. C++: Execution time = 58120164 microseconds (μs)
+2. CUDA: Execution time = 2.12906 seconds = 2129060 microseconds (μs)
+3. SIMD: Execution time = 57651444 microseconds (μs)
+4. x86: Execution time = 51708873 microseconds (μs)
 
 ### Let's calculate the percentage differences:
 
 For CUDA:
-Percentage Difference = ((CUDA Execution Time - C++ Execution Time) / C++ Execution Time) * 100
-Percentage Difference = ((3370.6 μs - 13000 μs) / 13000 μs) * 100 ≈ -74.07%
+Percentage Difference = ((CUDA Execution Time - C++ Execution Time) / C++ Execution Time) * 100 = ((2129060 μs - 58120164 μs) / 58120164 μs) * 100 = -96.34%
 
 For SIMD:
-Percentage Difference = ((SIMD Execution Time - C++ Execution Time) / C++ Execution Time) * 100
-Percentage Difference = ((10000 μs - 13000 μs) / 13000 μs) * 100 ≈ -23.08%
+Percentage Difference = ((SIMD Execution Time - C++ Execution Time) / C++ Execution Time) * 100 = ((57651444 μs - 58120164 μs) / 58120164 μs) * 100 = -0.81%
 
 For x86:
-Percentage Difference = ((x86 Execution Time - C++ Execution Time) / C++ Execution Time) * 100
-Percentage Difference = ((11000 μs - 13000 μs) / 13000 μs) * 100 ≈ -15.38%
+Percentage Difference = ((x86 Execution Time - C++ Execution Time) / C++ Execution Time) * 100 = ((51708873 μs - 58120164 μs) / 58120164 μs) * 100 = -10.99%
 
 ### Analysis:
 
-1. CUDA outperforms the C++ implementation significantly, with an approximate speedup of 74.07%.
-2. The SIMD implementation shows a speedup of around 23.08% compared to the C++ implementation.
-3. The x86 implementation offers a modest speedup of approximately 15.38% compared to the C++ implementation. However, like the SIMD, it still lags behind CUDA in terms of performance due to the limitations of CPU-based parallelism.
+1. The CUDA implementation shows a significant speedup of approximately 96.34% compared to the C++ implementation.
+2. The SIMD implementation has a negligible speedup of approximately 0.81%. This result indicates that SIMD's parallel processing capabilities do not provide a significant advantage over the sequential C++ implementation for the particular problem or data size considered.
+3. The x86 implementation shows a moderate speedup of approximately 10.99% compared to the C++ implementation. However, it is still less efficient than CUDA's massive parallelism.
 
 The performance analysis reveals that CUDA's superiority is due to its massive parallelism. While the CPU-based approaches execute the dot product sequentially, CUDA's GPU parallelism allows it to perform simultaneous calculations on multiple elements of the arrays.
 
